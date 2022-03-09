@@ -1,5 +1,5 @@
 # Action_Recognition_OpenVino
-Tested on Python 3.9 in a conda enviroment
+Tested on Python 3.9 in a conda enviroment with openvino installed
 
 Download model and place in folder
     

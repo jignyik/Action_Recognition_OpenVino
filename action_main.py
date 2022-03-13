@@ -1,13 +1,4 @@
 import os
-
-os.environ['Path'] += 'Local\\openvino_2021\\deployment_tools\\ngraph\\lib;' \
-                    'Local\\openvino_2021\\deployment_tools\\ngraph\\lib;' \
-                    'Local\\openvino_2021\\deployment_tools\\inference_engine\\external\\tbb\\bin;' \
-                    'Local\\openvino_2021\\deployment_tools\\inference_engine\\bin\\intel64\\Release;' \
-                    'Local\\openvino_2021\\deployment_tools\\inference_engine\\bin\\intel64\\Debug;' \
-                    'Local\\openvino_2021\\deployment_tools\\inference_engine\\external\\tbb\\bin;' \
-                    'Local\\openvino_2021\\deployment_tools\\model_optimizer;'
-
 from action_school import Arguments, FrameProcessor
 import cv2
 
@@ -27,10 +18,11 @@ while True:
         print(frame_processor.action_recog.pred_labels)
         print("Inference Time: {} seconds".format(round(time,2)))
 
-    cv2.imshow("", frame_processor.action_recog.draw_action_on_frame(frame_processor.action_boxes.draw_boxes(frame),
-                                                                     frame_processor.action_boxes.boxes))
+    cv2.imshow("", frame_processor.draw(frame))
 
     key = cv2.waitKey(1)
     # Quit
     if key in {ord('q'), ord('Q'), 27}:
         break
+
+

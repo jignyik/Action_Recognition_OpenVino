@@ -52,7 +52,7 @@ class ActionBoxes(Module):
             out = np.array([])
         return out
 
-    def postprocess(self, threshold=0.7):
+    def postprocess(self, threshold=0.4):
         output = self.get_outputs()[0][self.output_blob].buffer
         post_output = []
         for i in output[0][0]:
@@ -64,9 +64,10 @@ class ActionBoxes(Module):
         return self.box_for_action
 
     def draw_boxes(self, frame):
-        if self.boxes.any():
-            for i in self.boxes:
-                frame = cv2.rectangle(frame, (i[:2].astype("int")), (i[2:].astype("int")), (255, 255, 50), 2, cv2.LINE_AA)
+        if type(self.boxes) != "None":
+            if self.boxes.any():
+                for i in self.boxes:
+                    frame = cv2.rectangle(frame, (i[:2].astype("int")), (i[2:].astype("int")), (255, 255, 50), 2, cv2.LINE_AA)
         return frame
 
     def scale_boxes(self, inputs, size=256, height=480, width=640):
@@ -96,7 +97,7 @@ class ActionBoxes(Module):
         a = boxes
         n = len(a)
         if n == 0:
-            return None
+            return np.array([])
         out = np.concatenate((np.zeros((n, 1)), a), axis=1).astype("float16")
         return out
 

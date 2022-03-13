@@ -143,10 +143,10 @@ class ActionRecognition(Module):
             return pred_labels
 
     def draw_action_on_frame(self, frame, boxes):
-        if len(boxes) > 0 and self.pred_labels is not None:
+        if len(boxes) > 0 and self.pred_labels is not None and len(boxes) == len(self.pred_labels):
             for i, box in enumerate(boxes):
                 # get minimum x and y value
-                label_origin = box[:2].astype("int")
+                label_origin = np.array([box[0], box[3]]).astype("int")
                 # put text on top of the box
                 for u, o in enumerate(self.pred_labels[i]):
                     # increase the height by a offset

@@ -1,8 +1,10 @@
+import numpy as np
 from openvino.inference_engine import IECore
 from pathlib import Path
 from action_init import ActionRecognition
 from action_boxes import ActionBoxes
-
+from face_recognition_from_action import FrameProcessor as FaceRecog
+# need to add in a face recognition
 
 class Arguments:
     def __init__(self):
@@ -35,6 +37,7 @@ class FrameProcessor:
 
         self.action_recog = ActionRecognition(ie, args.action_model)
         self.action_recog.deploy(args.d_fd, self.get_config(args.d_fd))
+        self.face_recog = FaceRecog()
 
     def process(self, frame):
         boxes = self.action_boxes.box_for_action
@@ -42,19 +45,25 @@ class FrameProcessor:
         # Saved frame reaches half then inference box model
         if len(self.action_recog.saved_frames) == self.action_recog.frame_length:
             boxes = self.action_boxes.infer((frame,))
-
             # if there is no human present/detected, then the list of saved frame will clear and restart again
             if not boxes.any():
                 print("No human detected")
                 self.action_recog.saved_frames = []
+                self.action_recog.pred_labels = None
+
+            else:
+                for box in self.action_boxes.boxes:
+                    box = box.astype("int")
+                    names = self.face_recog.process(frame, box)
 
         # Saved frame reaches sequence length, proceed to feed frames to action recognition model
-        if len(self.action_recog.saved_frames) == self.action_recog.sqn_length:
+        if len(self.action_recog.saved_frames) == self.action_recog.sqn_length and len(boxes) != 0:
             action_result = self.action_recog.infer((self.action_recog.saved_frames, boxes))
             self.action_recog.saved_frames = []
             return action_result
 
-
-
-
+    def draw(self, frame):
+        frame = self.face_recog.draw_face(frame)
+        frame = self.action_recog.draw_action_on_frame(self.action_boxes.draw_boxes(frame), self.action_boxes.boxes)
+        return frame
 
